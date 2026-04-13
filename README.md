@@ -18,6 +18,20 @@ Most yield products help users find APY. StableOps solves a different problem: *
 
 ![StableOps Treasury workbench](./public/stableops-treasury-workbench.png)
 
+## For Judges
+
+| Item | Link / Proof |
+|---|---|
+| Live app | https://stableops-treasury.vercel.app |
+| Demo video | Coming soon |
+| Successful execution | https://basescan.org/tx/0x5bf01b31f161bf4ab0ad3b4c60d448469a66dda150cc6f02329a7dd188091e4b |
+| Network | Base mainnet |
+| LI.FI contract used | `LI.FI: LiFi Diamond` |
+| Input token | `1 USDC` |
+| Output position token | `0.939764550231504693 sparkUSDC` |
+| Test coverage | `6/6` policy-engine tests |
+| Track | AI x Earn |
+
 ## Live Demo
 
 - App: https://stableops-treasury.vercel.app
@@ -56,6 +70,17 @@ StableOps makes the flow legible for a real team wallet:
 Policy first. Route second. Signature last. Receipt always.
 ```
 
+## Why Not Just A Yield Dashboard?
+
+| Yield dashboard | StableOps Treasury |
+|---|---|
+| Shows APY first | Starts from treasury policy |
+| Assumes the user decides risk manually | Enforces reserve, cap, TVL, chain, and risk checks |
+| Optimizes for individual wallet yield | Optimizes for team treasury operations |
+| Shows opportunities | Produces executable Composer tickets |
+| Ends at transaction confirmation | Ends with an audit receipt and position-token explanation |
+| Hides why a route was chosen | Shows agent decisions before signing |
+
 ## LI.FI Integration
 
 StableOps uses LI.FI in two places:
@@ -77,6 +102,40 @@ Network: Base
 Status: Success
 Input: 1 USDC
 Output: 0.939764550231504693 sparkUSDC
+```
+
+## Architecture
+
+```mermaid
+flowchart LR
+  A["Team treasury mandate"] --> B["Policy engine"]
+  B --> C["LI.FI Earn discovery"]
+  C --> D["Vault filter"]
+  D --> E["Composer ticket"]
+  E --> F["Wallet signature"]
+  F --> G["LI.FI Diamond"]
+  G --> H["Vault position token"]
+  H --> I["Audit receipt"]
+
+  B -. "reserve target\nmax execution\nchain allowlist\nTVL floor\nrisk mode" .-> D
+  E -. "route\napproval target\nestimated output" .-> F
+  I -. "vault\nchain\ntx hash\nreceipt token" .-> A
+```
+
+## Execution State Machine
+
+```mermaid
+stateDiagram-v2
+  [*] --> PolicyDraft
+  PolicyDraft --> RouteDiscovery: run treasury scan
+  RouteDiscovery --> PolicyRejected: no approved vault
+  RouteDiscovery --> ComposerReady: approved vault selected
+  ComposerReady --> QuotePrepared: prepare quote
+  QuotePrepared --> WalletSigning: execute deposit
+  WalletSigning --> ExecutionFailed: reverted or insufficient balance
+  WalletSigning --> ReceiptReady: confirmed success
+  ExecutionFailed --> QuotePrepared: refresh quote or lower amount
+  ReceiptReady --> [*]
 ```
 
 ## Product Flow
@@ -154,6 +213,7 @@ npm run dev
 npm run typecheck
 npm run build
 npm run start
+npm run test
 ```
 
 ## Environment
@@ -188,6 +248,7 @@ StableOps is built to align with the strongest hackathon patterns:
 - **Agent legibility**: every agent decision is visible and auditable.
 - **Composer-native flow**: the approved route becomes a wallet-executable deposit ticket.
 - **Post-execution explanation**: the user sees what receipt token they now hold and why it matters.
+- **Tested policy core**: reserve guardrail, execution cap, chain allowlist, TVL floor, and risk classification are covered by tests.
 
 ## License
 
