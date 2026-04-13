@@ -1,22 +1,40 @@
+<p align="center">
+  <img src="./public/stableops-treasury-workbench.png" alt="StableOps Treasury workbench" />
+</p>
+
 # StableOps Treasury
+
+## Governed USDC yield execution for team wallets
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![LI.FI Earn](https://img.shields.io/badge/LI.FI-Earn-7CFFB2)
 ![Composer](https://img.shields.io/badge/LI.FI-Composer-2364FF)
 ![Base](https://img.shields.io/badge/Base-mainnet-0052FF)
 ![Track](https://img.shields.io/badge/DeFi%20Mullet-AI%20x%20Earn-F2A93B)
+![Tests](https://img.shields.io/badge/policy%20tests-6%2F6-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-**Policy-first stablecoin treasury execution for small teams, DAOs, and indie builders.**
+> **StableOps is a policy-first treasury executor that helps small teams, DAOs, and indie builders move idle USDC into LI.FI Earn vaults without turning treasury management into a DeFi scavenger hunt.**
 
-StableOps Treasury turns idle USDC into a governed LI.FI Earn execution flow:
+Most yield products answer:
 
 ```text
-Treasury policy -> Earn route discovery -> policy checks -> Composer quote -> wallet execution -> audit receipt
+Where is the highest APY?
 ```
 
-Most yield products help users find APY. StableOps solves a different problem: **can a team treasury safely deploy this amount into this vault right now?**
+StableOps answers:
 
-![StableOps Treasury workbench](./public/stableops-treasury-workbench.png)
+```text
+Can this team treasury safely deploy this amount into this vault right now?
+```
+
+That difference matters. A team wallet is not a personal wallet. A treasury action needs reserve protection, execution limits, chain scope, vault quality checks, signer visibility, and an audit receipt after execution.
+
+StableOps turns that into one governed flow:
+
+```text
+Treasury policy -> LI.FI Earn discovery -> Policy checks -> Composer quote -> Wallet execution -> Audit receipt
+```
 
 ## For Judges
 
@@ -31,6 +49,29 @@ Most yield products help users find APY. StableOps solves a different problem: *
 | Output position token | `0.939764550231504693 sparkUSDC` |
 | Test coverage | `6/6` policy-engine tests |
 | Track | AI x Earn |
+
+## 30-Second Pitch
+
+Small teams often hold idle USDC, but deploying that treasury into yield is still a manual operational process. Someone has to compare vaults, check chains, preserve working capital, review TVL, prepare approvals, sign the transaction, and explain the resulting position token to the rest of the team.
+
+StableOps compresses that into a single treasury execution layer.
+
+The team defines a mandate first: reserve target, deployment size, max action size, allowed chains, TVL floor, and risk mode. StableOps then uses LI.FI Earn to discover USDC vaults, filters them through the mandate, turns approved routes into LI.FI Composer tickets, executes through the connected wallet, and produces a receipt that explains what the treasury now holds.
+
+The product is not trying to be another APY table. It is trying to be the missing workflow between **"we have idle stablecoins"** and **"this treasury action is approved, executed, and explainable."**
+
+## Core Numbers
+
+| Metric | Value |
+|---|---|
+| Demo treasury size | `100 USDC` |
+| Protected operating reserve | `60%` |
+| Demo deployment | `1 USDC` |
+| Max action size | `5 USDC` |
+| Minimum vault TVL | `$5,000,000` |
+| Successful output | `0.939764550231504693 sparkUSDC` |
+| Policy tests | `6 passing` |
+| Execution chain | `Base mainnet` |
 
 ## Live Demo
 
@@ -54,6 +95,24 @@ Teams define:
 - Risk mode
 
 StableOps then discovers LI.FI Earn-compatible USDC vaults, filters them through the policy, creates a Composer execution ticket, and reports what happened after signing.
+
+## User Story
+
+Imagine a small protocol team with stablecoins sitting idle in a team wallet.
+
+They do not want an agent to freely chase yield. They also do not want to manually inspect every DeFi venue from scratch. What they need is a constrained operator:
+
+```text
+Keep 60% liquid.
+Only deploy 1 USDC in this demo action.
+Never exceed 5 USDC per execution.
+Only use approved chains.
+Only use vaults above the TVL floor.
+Show the signer exactly what will happen before signing.
+After execution, explain the receipt token.
+```
+
+StableOps makes that operating model visible in the product instead of burying it in a spreadsheet, chat thread, or off-chain policy doc.
 
 ## Why It Matters
 
@@ -80,6 +139,21 @@ Policy first. Route second. Signature last. Receipt always.
 | Shows opportunities | Produces executable Composer tickets |
 | Ends at transaction confirmation | Ends with an audit receipt and position-token explanation |
 | Hides why a route was chosen | Shows agent decisions before signing |
+
+## What Makes It Agentic?
+
+StableOps does not present the AI layer as magic. It decomposes the treasury action into explicit roles:
+
+| Agent role | Responsibility | Output |
+|---|---|---|
+| Treasury Mandate | Scope deployment amount and reserve | Is this amount allowed? |
+| LI.FI Earn Scout | Discover vault candidates | Which vaults are executable? |
+| Risk Gate | Apply TVL, risk, and chain filters | Which routes are blocked? |
+| Policy Controller | Enforce the treasury mandate | Can a Composer ticket be prepared? |
+| Composer Executor | Prepare the executable route | What does the signer need to approve? |
+| Treasury Reporter | Explain the final position | What did the treasury receive? |
+
+The important design choice: **agents recommend and prepare, but policy gates execution and the wallet signs.**
 
 ## LI.FI Integration
 
